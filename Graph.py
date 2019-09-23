@@ -20,15 +20,15 @@ class Graph:
     def printPath(self, s, f, parent, nodesVisited):
         print("Nodes Visited: ", nodesVisited)
         path = [f]
-        p = parent[f]
+        p = f
         while p in parent:
             path.insert(0, p)
             p = parent[p]
         path.insert(0, s)
-        print("Path taken: ", end='')
-        for i in range(len(path)):
-            print(path[i], ' ', end='')
-        print()
+        #print("Path taken: ", end='')
+        #for i in range(len(path)):
+        #    print(path[i], ' ', end='')
+        #print()
 
     def insertSorted(self, pq, e, distances):
         i = 0
@@ -47,8 +47,6 @@ class Graph:
     def addHeuristic(self, id, h):
         if id in self.adjDict:
             self.heuristics[id] = h
-        else:
-            print("invalid id")
 
     def bfs(self, s, f):
         visited = {}
@@ -93,7 +91,7 @@ class Graph:
                 else:
                     if distance[v] > distance[u] + self.adjDict[u][v]:
                         distance[v] = distance[u] + self.adjDict[u][v]
-                        parent[v] = u\
+                        parent[v] = u
                         if v in pq:
                             pq.remove(v)
                         self.insertSorted(pq, v, distance)
@@ -149,8 +147,39 @@ class Graph:
                 i += 1
             print()
 
+def tokenize(string, token):
+    list = []
+    substring = ""
+    for letter in string:
+        if letter != token:
+            substring += letter
+        else:
+            list.append(substring)
+            substring = ""
+    if substring is not "":
+        list.append(substring[:-1])
+    return list
+
+def readEdges(g):
+    file = open("edges.txt", 'r')
+    for line in file:
+        strs = tokenize(line, ' ')
+        g.addWeightedEdge(strs[0], strs[1], float(strs[2]))
+
+def readHeuristic(g):
+    file = open("heuristic.txt", 'r')
+    for line in file:
+        strs = tokenize(line, ' ')
+        g.addHeuristic(strs[0], float(strs[1]))
+
+
 
 g = Graph()
+readEdges(g)
+g.bfs('1436076226', '105012740')
+g.ucs('1436076226', '105012740')
+readHeuristic(g)
+g.astar('1436076226', '105012740')
 #g.addWeightedEdge('A', 'B', 12)
 #g.addWeightedEdge('A', 'D', 5)
 #g.addWeightedEdge('A', 'C', 2)
@@ -215,27 +244,26 @@ g = Graph()
 #g.addHeuristic('F', 3)
 #g.addHeuristic('H', 0)
 
-g.addWeightedEdge('A', 'B', 2)
-g.addWeightedEdge('A', 'D', 2)
-g.addWeightedEdge('A', 'F', 10)
-g.addWeightedEdge('A', 'C', 0)
-g.addWeightedEdge('B', 'D', 1)
-g.addWeightedEdge('C', 'D', 1)
-g.addWeightedEdge('C', 'E', 0)
-g.addWeightedEdge('D', 'F', 1)
-g.addWeightedEdge('D', 'E', 0)
+#g.addWeightedEdge('A', 'B', 2)
+#g.addWeightedEdge('A', 'D', 2)
+#g.addWeightedEdge('A', 'F', 10)
+#g.addWeightedEdge('A', 'C', 0)
+#g.addWeightedEdge('B', 'D', 1)
+#g.addWeightedEdge('C', 'D', 1)
+#g.addWeightedEdge('C', 'E', 0)
+#g.addWeightedEdge('D', 'F', 1)
+#g.addWeightedEdge('D', 'E', 0)
 
-g.addHeuristic('A', 0)
-g.addHeuristic('B', -5)
-g.addHeuristic('C', -5)
-g.addHeuristic('D', -5)
-g.addHeuristic('E', -5)
-g.addHeuristic('F', 10)
+#g.addHeuristic('A', 0)
+#g.addHeuristic('B', -5)
+#g.addHeuristic('C', -50)
+#g.addHeuristic('D', -500)
+#g.addHeuristic('E', -5000)
+#g.addHeuristic('F', 10)
 
 #g.addWeightedEdge('A', 'C', 10)
 #g.addWeightedEdge('A', 'B', 1)
 #g.addWeightedEdge('B', 'C', 1)
-g.bfs('A', 'F')
-g.ucs('A', 'F')
-g.astar('A', 'F')
-
+#g.bfs('A', 'F')
+#g.ucs('A', 'F')
+#g.astar('A', 'F')
