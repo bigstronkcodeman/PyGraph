@@ -93,8 +93,9 @@ class Graph:
                 else:
                     if distance[v] > distance[u] + self.adjDict[u][v]:
                         distance[v] = distance[u] + self.adjDict[u][v]
-                        parent[v] = u
-                        pq.remove(v)
+                        parent[v] = u\
+                        if v in pq:
+                            pq.remove(v)
                         self.insertSorted(pq, v, distance)
         nodesVisited += 1
         print("UCS:")
@@ -129,7 +130,8 @@ class Graph:
                     if distance[v] > distance[u] + self.adjDict[u][v]:
                         distance[v] = distance[u] + self.adjDict[u][v]
                         parent[v] = u
-                        pq.remove(v)
+                        if v in pq:
+                            pq.remove(v)
                         self.insertSorted(pq, v, distance)
         nodesVisited += 1
         print("astar:")
