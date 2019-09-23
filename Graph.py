@@ -5,30 +5,22 @@ class Graph:
     def __init__(self):
         self.adjDict = {}
         self.heuristics = {}
-        self.numVertices = 0
 
     def addWeightedEdge(self, id1, id2, weight):
         if id1 not in self.adjDict:
             self.adjDict[id1] = {}
-            self.numVertices += 1
         if id2 not in self.adjDict:
             self.adjDict[id2] = {}
-            self.numVertices += 1
         self.adjDict[id1][id2] = weight
         self.adjDict[id2][id1] = weight
 
-    def printPath(self, s, f, parent, nodesVisited):
-        print("Nodes Visited: ", nodesVisited)
-        path = [f]
-        p = f
-        while p in parent:
-            path.insert(0, p)
-            p = parent[p]
-        path.insert(0, s)
-        #print("Path taken: ", end='')
-        #for i in range(len(path)):
-        #    print(path[i], ' ', end='')
-        #print()
+    def nodesOnPath(self, parent, f):
+        nodesOnPath = 1
+        n = f
+        while n in parent:
+            n = parent[n]
+            nodesOnPath += 1
+        return nodesOnPath
 
     def insertSorted(self, pq, e, distances):
         i = 0
@@ -49,11 +41,8 @@ class Graph:
             self.heuristics[id] = h
 
     def bfs(self, s, f):
-        visited = {}
-        distance = {}
-        parent = {}
-        Q = []
-        Q.append(s)
+        visited, distance, parent = {}, {}, {}
+        Q = [s]
         distance[s] = 0
         nodesVisited = 0
         while len(Q) > 0 and Q[0] != f:
@@ -68,13 +57,12 @@ class Graph:
                     parent[v] = u
         nodesVisited += 1
         print("BFS:")
-        self.printPath(s, f, parent, nodesVisited)
+        print("Nodes visited: ", nodesVisited)
+        print("Nodes on path: ", self.nodesOnPath(parent, f))
         print("Distance Travelled: ", distance[f], " kilometer(s)")
 
     def ucs(self, s, f):
-        visited = {}
-        distance = {}
-        parent = {}
+        visited, distance, parent = {}, {}, {}
         pq = [s]
         nodesVisited = 0
         distance[s] = 0
@@ -97,20 +85,12 @@ class Graph:
                         self.insertSorted(pq, v, distance)
         nodesVisited += 1
         print("UCS:")
-        self.printPath(s, f, parent, nodesVisited) 
+        print("Nodes visited: ", nodesVisited)
+        print("Nodes on path: ", self.nodesOnPath(parent, f))
         print("Distance Travelled: ", distance[f], " kilometer(s)")
 
     def astar(self, s, f):
-        if len(self.heuristics) != self.numVertices:
-            print("Not all vertices have been given heuristics")
-        visited = {}
-        distance = {}
-        for i in self.adjDict:
-            if i is not s:
-                distance[i] = math.inf
-            else:
-                distance[i] = 0
-        parent = {}
+        visited, distance, parent = {}, {}, {}
         pq = [s]
         nodesVisited = 0
         distance[s] = 0
@@ -132,54 +112,33 @@ class Graph:
                             pq.remove(v)
                         self.insertSorted(pq, v, distance)
         nodesVisited += 1
-        print("astar:")
-        self.printPath(s, f, parent, nodesVisited) 
+        print("A*:")
+        print("Nodes visited: ", nodesVisited) 
+        print("Nodes on path: ", self.nodesOnPath(parent, f))
         print("Distance Travelled: ", distance[f], " kilometer(s)")
-
-    def print(self):
-        for d in self.adjDict:
-            print(d, ' -> ', end='')
-            i = 1
-            for v in self.adjDict[d]:
-                print(v, end='')
-                if i != len(self.adjDict[d]):
-                    print(', ', end='')
-                i += 1
-            print()
-
-def tokenize(string, token):
-    list = []
-    substring = ""
-    for letter in string:
-        if letter != token:
-            substring += letter
-        else:
-            list.append(substring)
-            substring = ""
-    if substring is not "":
-        list.append(substring[:-1])
-    return list
 
 def readEdges(g):
     file = open("edges.txt", 'r')
     for line in file:
-        strs = tokenize(line, ' ')
-        g.addWeightedEdge(strs[0], strs[1], float(strs[2]))
+        strs = map(float, line.split())
+        g.addWeightedEdge(*strs)
 
 def readHeuristic(g):
     file = open("heuristic.txt", 'r')
     for line in file:
-        strs = tokenize(line, ' ')
-        g.addHeuristic(strs[0], float(strs[1]))
+        strs = map(float, line.split())
+        g.addHeuristic(*strs)
 
 
 
 g = Graph()
 readEdges(g)
-g.bfs('1436076226', '105012740')
-g.ucs('1436076226', '105012740')
+g.bfs(1025817038, 105012740)
+print()
+g.ucs(1025817038, 105012740)
+print()
 readHeuristic(g)
-g.astar('1436076226', '105012740')
+g.astar(1025817038, 105012740)
 #g.addWeightedEdge('A', 'B', 12)
 #g.addWeightedEdge('A', 'D', 5)
 #g.addWeightedEdge('A', 'C', 2)
