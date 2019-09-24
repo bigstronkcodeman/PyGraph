@@ -16,25 +16,31 @@ class Graph:
 
     def nodesOnPath(self, parent, f):
         nodesOnPath = 1
-        n = f
-        while n in parent:
-            n = parent[n]
+        while f in parent:
+            f = parent[f]
             nodesOnPath += 1
         return nodesOnPath
 
     def insertSorted(self, pq, e, distances):
-        i = 0
-        while i in range(len(pq)):
-            h1 = 0
-            h2 = 0
-            if pq[i] in self.heuristics:
-                h1 = self.heuristics[pq[i]]
-            if e in self.heuristics:
-                h2 = self.heuristics[e]
-            if distances[pq[i]] + h1 > distances[e] + h2:
-                break
-            i += 1
-        pq.insert(i, e)
+        default = 0
+        ecost = distances[e] + self.heuristics.get(e, default)
+        if not pq or distances[pq[0]] + self.heuristics.get(pq[0], default) >= ecost:
+            pq.insert(0, e)
+            return
+        if distances[pq[len(pq) - 1]] + self.heuristics.get(pq[len(pq) - 1], default) <= ecost:
+            pq.append(e)
+            return
+        low = 0
+        high = len(pq) - 1
+        mid = int((low + high) / 2)
+        while low < high and pq[mid] != e:
+            if distances[pq[mid]] + self.heuristics.get(pq[mid], default) < ecost:
+                low = mid + 1
+                mid = int((low + high) / 2)
+            else:
+                high = mid - 1
+                mid = int((low + high) / 2)
+        pq.insert(mid, e)
 
     def addHeuristic(self, id, h):
         if id in self.adjDict:
@@ -117,28 +123,31 @@ class Graph:
         print("Nodes on path: ", self.nodesOnPath(parent, f))
         print("Distance Travelled: ", distance[f], " kilometer(s)")
 
+    def print(self):
+        for u in self.adjDict:
+            for v in self.adjDict[u]:
+                print(u, ' to ', v, 'weight: ', self.adjDict[u][v])
+
 def readEdges(g):
-    file = open("edges.txt", 'r')
-    for line in file:
-        strs = map(float, line.split())
-        g.addWeightedEdge(*strs)
+    with open("edges.txt", 'r') as file:
+        for line in file:
+            strs = map(float, line.split())
+            g.addWeightedEdge(*strs)
 
 def readHeuristic(g):
-    file = open("heuristic.txt", 'r')
-    for line in file:
-        strs = map(float, line.split())
-        g.addHeuristic(*strs)
-
-
+    with open("heuristic.txt", 'r') as file:
+        for line in file:
+            strs = map(float, line.split())
+            g.addHeuristic(*strs)
 
 g = Graph()
 readEdges(g)
-g.bfs(1025817038, 105012740)
+g.bfs(107560551, 105012740)
 print()
-g.ucs(1025817038, 105012740)
+g.ucs(107560551, 105012740)
 print()
 readHeuristic(g)
-g.astar(1025817038, 105012740)
+g.astar(107560551, 105012740)
 #g.addWeightedEdge('A', 'B', 12)
 #g.addWeightedEdge('A', 'D', 5)
 #g.addWeightedEdge('A', 'C', 2)
@@ -163,6 +172,7 @@ g.astar(1025817038, 105012740)
 #g.addWeightedEdge('M', 'L', 1)
 #g.addWeightedEdge('M', 'K', 3)
 #g.addWeightedEdge('M', 'J', 2)
+#g.print()
 
 #g.addWeightedEdge('A', 'B', 2)
 #g.addWeightedEdge('A', 'C', 7)
@@ -223,6 +233,6 @@ g.astar(1025817038, 105012740)
 #g.addWeightedEdge('A', 'C', 10)
 #g.addWeightedEdge('A', 'B', 1)
 #g.addWeightedEdge('B', 'C', 1)
-#g.bfs('A', 'F')
-#g.ucs('A', 'F')
-#g.astar('A', 'F')
+#g.bfs('A', 'K')
+#g.ucs('A', 'K')
+#g.astar('A', 'K')
